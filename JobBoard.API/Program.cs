@@ -1,5 +1,6 @@
 using JobBoard.Application;
 using JobBoard.Infrastructure;
+using JobBoard.Infrastructure.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -17,6 +18,11 @@ if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
+}
+
+using (var scope = app.Services.CreateScope())
+{
+    await IdentitySeeder.SeedAsync(scope.ServiceProvider);
 }
 
 app.UseHttpsRedirection();
