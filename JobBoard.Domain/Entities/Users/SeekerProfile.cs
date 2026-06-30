@@ -9,8 +9,6 @@ namespace JobBoard.Domain.Entities.Users
 {
     public class SeekerProfile : BaseEntity
     {
-        public string FirstName { get; set; } = default!;
-        public string LastName { get; set; } = default!;
         public string JobTitle { get; set; }          
         public string Location { get; set; }          
         public string Bio { get; set; }                  
