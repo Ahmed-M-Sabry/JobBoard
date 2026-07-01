@@ -16,5 +16,9 @@ namespace JobBoard.Application.Interfaces
             string password);
 
         Task<IList<string>> GetRolesAsync(string userId);
+
+        Task<AuthenticatedUserDto?> GetUserByIdAsync(string userId);
+
+        Task AddToRoleAsync(string userId , string role);
     }
 }

@@ -1,7 +1,9 @@
 ﻿using JobBoard.Application.Dtos.AuthenticationDtos.Login;
 using JobBoard.Application.Dtos.AuthenticationDtos.Resgister;
 using JobBoard.Application.Interfaces;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 namespace JobBoard.API.Controllers
 {
     [Route("api/[controller]")]
@@ -16,6 +18,26 @@ namespace JobBoard.API.Controllers
         {
             _authService = authService;
             _tokenService= tokenService;
+        }
+
+        [HttpGet("Get-Me")]
+        [Authorize]
+        public async Task<IActionResult> Get()
+        {
+            try
+            {
+                var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+                if(userId == null) 
+                    return Unauthorized(new { Message = "User is not authenticated" });
+                
+                var data = await _authService.GetUserData(userId);
+
+                return Ok(data);
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(ex.Message);
+            }
         }
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterRequestDto registerRequest)
@@ -73,7 +95,7 @@ namespace JobBoard.API.Controllers
 
             if (!string.IsNullOrEmpty(refreshToken))
             {
-                await .LogoutAsync(refreshToken);
+                await _tokenService.LogoutAsync(refreshToken);
             }
 
             Response.Cookies.Delete("refreshToken");

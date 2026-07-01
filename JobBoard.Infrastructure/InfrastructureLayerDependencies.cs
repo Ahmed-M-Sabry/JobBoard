@@ -29,6 +29,9 @@ namespace JobBoard.Infrastructure
             service.AddScoped<IIdentityService, IdentityService>();
             service.AddScoped<IAuthService, AuthService>();
             service.AddScoped<ITokenService, TokenService>();
+            service.AddScoped<ISeekerProfileService, SeekerProfileService>();
+            service.AddScoped<IEmployerProfileService, EmployerProfileService>();
+
 
             return service;
         }

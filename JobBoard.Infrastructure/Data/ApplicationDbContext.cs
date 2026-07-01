@@ -36,5 +36,7 @@ namespace JobBoard.Infrastructure.Data
         public DbSet<JobPost> JobPosts { get; set; }
         public DbSet<JobApplication> JobApplications { get; set; }
         public DbSet<RefreshToken> RefreshTokens { get; set; }
+        public DbSet<SeekerProfile> SeekerProfiles { get; set; }
+        public DbSet<EmployerProfile> EmployerProfiles { get; set; }
     }
 }

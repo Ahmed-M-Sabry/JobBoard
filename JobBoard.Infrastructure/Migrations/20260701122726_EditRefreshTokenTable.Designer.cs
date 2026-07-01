@@ -4,6 +4,7 @@ using JobBoard.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JobBoard.Infrastructure.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260701122726_EditRefreshTokenTable")]
+    partial class EditRefreshTokenTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -158,7 +161,7 @@ namespace JobBoard.Infrastructure.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("EmployerProfiles");
+                    b.ToTable("EmployerProfile");
                 });
 
             modelBuilder.Entity("JobBoard.Domain.Entities.Users.SeekerProfile", b =>
@@ -217,7 +220,7 @@ namespace JobBoard.Infrastructure.Migrations
                     b.HasIndex("ApplicationUserId")
                         .IsUnique();
 
-                    b.ToTable("SeekerProfiles");
+                    b.ToTable("SeekerProfile");
                 });
 
             modelBuilder.Entity("JobBoard.Infrastructure.Authentication.ApplicationUser", b =>

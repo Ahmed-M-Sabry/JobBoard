@@ -1,6 +1,7 @@
 ﻿using JobBoard.Application.Dtos.AuthenticationDtos.Login;
 using JobBoard.Application.Interfaces;
 using JobBoard.Infrastructure.Authentication;
+using JobBoard.Infrastructure.Data;
 using Microsoft.AspNetCore.Identity;
 using System;
 using System.Collections.Generic;
@@ -13,11 +14,28 @@ namespace JobBoard.Infrastructure.Implementation
     public class IdentityService : IIdentityService
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        public IdentityService(UserManager<ApplicationUser> userManager)
+        private readonly ApplicationDbContext _context;
+        public IdentityService(UserManager<ApplicationUser> userManager , ApplicationDbContext context)
         {
             _userManager = userManager;
+            _context = context;
         }
 
+        public async Task AddToRoleAsync(string userId, string role)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+                throw new Exception("User not found");
+
+            var result = await _userManager.AddToRoleAsync(user, role);
+            
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                throw new Exception($"Failed to add role: {errors}");
+            }
+        }
         public async Task<IList<string>> GetRolesAsync(string userId)
         {
             var user = await _userManager.FindByIdAsync(userId);
@@ -26,6 +44,23 @@ namespace JobBoard.Infrastructure.Implementation
 
             var roles = await _userManager.GetRolesAsync(user);
             return roles;
+        }
+
+        public async Task<AuthenticatedUserDto?> GetUserByIdAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            
+            if(user == null) 
+                return null;
+            var Roles = await _userManager.GetRolesAsync(user);
+
+            return new AuthenticatedUserDto
+            {
+                UserId = user.Id,
+                Email = user.Email,
+                FullName = user.FullName,
+                Roles = Roles.ToList()
+            };
         }
 
         public async Task<string> RegisterAsync(string email, string password, string fullName)
