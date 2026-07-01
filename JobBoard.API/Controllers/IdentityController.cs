@@ -10,9 +10,12 @@ namespace JobBoard.API.Controllers
     {
 
         private readonly IAuthService _authService;
-        public IdentityController(IAuthService authService)
+        private readonly ITokenService _tokenService;
+        public IdentityController(IAuthService authService 
+            ,ITokenService tokenService)
         {
             _authService = authService;
+            _tokenService= tokenService;
         }
         [HttpPost("Register")]
         public async Task<IActionResult> Register(RegisterRequestDto registerRequest)
@@ -70,7 +73,7 @@ namespace JobBoard.API.Controllers
 
             if (!string.IsNullOrEmpty(refreshToken))
             {
-                await _authService.LogoutAsync(refreshToken);
+                await .LogoutAsync(refreshToken);
             }
 
             Response.Cookies.Delete("refreshToken");
