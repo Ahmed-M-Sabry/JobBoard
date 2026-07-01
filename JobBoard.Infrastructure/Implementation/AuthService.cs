@@ -1,4 +1,5 @@
-﻿using JobBoard.Application.Dtos.AuthenticationDtos.Login;
+﻿using JobBoard.Application.AuthenticationDtos.UserData;
+using JobBoard.Application.Dtos.AuthenticationDtos.Login;
 using JobBoard.Application.Dtos.AuthenticationDtos.Resgister;
 using JobBoard.Application.Interfaces;
 using JobBoard.Domain.AuthenticationHepler;
@@ -78,6 +79,15 @@ namespace JobBoard.Infrastructure.Implementation
             };
         }
 
-
+        public async Task<UserData> GetUserData(string userId)
+        {
+            var user = await _identityService.GetUserByIdAsync(userId);
+            return new UserData
+            {
+                FullName = user.FullName,
+                Email = user.Email,
+                Roles = user.Roles
+            };
+        }
     }
 }
