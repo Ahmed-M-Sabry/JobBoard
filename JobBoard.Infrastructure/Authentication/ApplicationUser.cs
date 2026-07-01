@@ -11,5 +11,7 @@ namespace JobBoard.Infrastructure.Authentication
     {
         public string FullName { get; set; }
 
+        public ICollection<RefreshToken> RefreshToken { get; set; }
+
     }
 }

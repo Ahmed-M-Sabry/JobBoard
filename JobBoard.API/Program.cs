@@ -1,4 +1,5 @@
 using JobBoard.Application;
+using JobBoard.Domain.AuthenticationHepler;
 using JobBoard.Infrastructure;
 using JobBoard.Infrastructure.Data;
 
@@ -11,6 +12,8 @@ builder.Services.AddSwaggerGen();
 builder.Services
     .InfrastructureLayerServices()
     .ApplicationLayerServices();
+
+builder.Services.Configure<JwtSetting>(builder.Configuration.GetSection(nameof(JwtSetting)));
 
 var app = builder.Build();
 
