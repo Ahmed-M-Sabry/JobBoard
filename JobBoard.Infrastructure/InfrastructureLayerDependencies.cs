@@ -28,6 +28,8 @@ namespace JobBoard.Infrastructure
 
             service.AddScoped<IIdentityService, IdentityService>();
             service.AddScoped<IAuthService, AuthService>();
+            service.AddScoped<ITokenService, TokenService>();
+
             return service;
         }
     }

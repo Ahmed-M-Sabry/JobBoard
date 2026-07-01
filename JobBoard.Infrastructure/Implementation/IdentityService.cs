@@ -1,4 +1,5 @@
-﻿using JobBoard.Application.Interfaces;
+﻿using JobBoard.Application.Dtos.AuthenticationDtos.Login;
+using JobBoard.Application.Interfaces;
 using JobBoard.Infrastructure.Authentication;
 using Microsoft.AspNetCore.Identity;
 using System;
@@ -15,6 +16,16 @@ namespace JobBoard.Infrastructure.Implementation
         public IdentityService(UserManager<ApplicationUser> userManager)
         {
             _userManager = userManager;
+        }
+
+        public async Task<IList<string>> GetRolesAsync(string userId)
+        {
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+                return new List<string>();
+
+            var roles = await _userManager.GetRolesAsync(user);
+            return roles;
         }
 
         public async Task<string> RegisterAsync(string email, string password, string fullName)
@@ -36,6 +47,24 @@ namespace JobBoard.Infrastructure.Implementation
                 throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
 
             return user.Id;
+        }
+
+        public async Task<AuthenticatedUserDto> ValidateUserAsync(string email, string password)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+            if(user == null)
+                return null;
+            var isValid = await _userManager.CheckPasswordAsync(user, password);
+            if(isValid == false) 
+                return null;
+
+            var AuthenticatedUser = new AuthenticatedUserDto
+            {
+                UserId = user.Id,
+                Email = user.Email,
+                FullName = user.FullName
+            };
+            return AuthenticatedUser;
         }
     }
 }

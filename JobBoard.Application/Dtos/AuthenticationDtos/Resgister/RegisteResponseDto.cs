@@ -4,9 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace JobBoard.Application.Dtos.AuthenticationDtos
+namespace JobBoard.Application.Dtos.AuthenticationDtos.Resgister
 {
-    public class AuthResponseDto
+    public class RegisteResponseDto
     {
         public string UserId { get; set; }
         public string Email { get; set; }

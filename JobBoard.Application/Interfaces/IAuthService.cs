@@ -1,4 +1,5 @@
-﻿using JobBoard.Application.Dtos.AuthenticationDtos;
+﻿using JobBoard.Application.Dtos.AuthenticationDtos.Login;
+using JobBoard.Application.Dtos.AuthenticationDtos.Resgister;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -9,6 +10,9 @@ namespace JobBoard.Application.Interfaces
 {
     public interface IAuthService
     {
-        Task<AuthResponseDto> RegisterAsync(RegisterRequestDto request);
+        Task<RegisteResponseDto> RegisterAsync(RegisterRequestDto request);
+
+        Task<LoginResponseDto> LoginAsync(LoginRequestDto request);
+        Task<LoginResponseDto> RefreshTokensAsync(string refreshToken);
     }
 }
