@@ -13,6 +13,7 @@ namespace JobBoard.Domain.Entities.Users
         public string CompanyName { get; set; } = default!;
         public string Location { get; set; }
         public string Description { get; set; }
+        public ICollection<JobPost> jobPosts { get; set; }
 
         // public string Industry { get; set; }  // Will add this later when I implement industry categories
 
