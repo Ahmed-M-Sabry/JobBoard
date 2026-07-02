@@ -82,6 +82,9 @@ namespace JobBoard.Infrastructure.Implementation
         public async Task<UserData> GetUserData(string userId)
         {
             var user = await _identityService.GetUserByIdAsync(userId);
+            if (user == null)
+                throw new Exception("User not found");
+
             return new UserData
             {
                 FullName = user.FullName,

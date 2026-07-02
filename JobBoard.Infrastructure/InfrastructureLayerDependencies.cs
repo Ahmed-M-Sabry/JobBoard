@@ -31,7 +31,7 @@ namespace JobBoard.Infrastructure
             service.AddScoped<ITokenService, TokenService>();
             service.AddScoped<ISeekerProfileService, SeekerProfileService>();
             service.AddScoped<IEmployerProfileService, EmployerProfileService>();
-
+            service.AddScoped<IJobPostService, JobPostService>();
 
             return service;
         }

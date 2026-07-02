@@ -12,6 +12,7 @@ namespace JobBoard.Application.Interfaces
     {
         Task CreateAsync(string userId, CreateEmployeerProfileDto dto);
         Task<EmployerProfileDto> GetByUserIdAsync(string userId);
+
         //Task UpdateAsync(string userId, UpdateEmployerProfileDto dto);
     }
 }

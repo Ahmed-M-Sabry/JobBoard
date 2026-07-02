@@ -8,6 +8,7 @@ namespace JobBoard.Application.Dtos.AuthenticationDtos.User.UserData.Profile
 {
     public class SeekerProfileDto
     {
+        public int Id { get; set; }
         public string JobTitle { get; set; } = default!;
         public string Location { get; set; } = default!;
         public string Bio { get; set; } = default!;

@@ -9,6 +9,7 @@ namespace JobBoard.Domain.Enum
     public enum JobStatus
     {
         Open,
-        Closed
+        Closed,
+        Draft
     }
 }

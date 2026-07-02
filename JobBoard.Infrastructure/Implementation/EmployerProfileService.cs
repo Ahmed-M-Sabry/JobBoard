@@ -23,7 +23,7 @@ namespace JobBoard.Infrastructure.Implementation
         public async Task<EmployerProfileDto> GetByUserIdAsync(string userId)
         {
             var profile = await _context.EmployerProfiles
-                .AsNoTracking()
+                //.AsNoTracking()
                 .FirstOrDefaultAsync(x => x.ApplicationUserId == userId);
 
             if (profile == null)
@@ -31,6 +31,7 @@ namespace JobBoard.Infrastructure.Implementation
 
             return new EmployerProfileDto
             {
+                Id= profile.Id,
                 userId = profile.ApplicationUserId,
                 CompanyName = profile.CompanyName,
                 Location = profile.Location,

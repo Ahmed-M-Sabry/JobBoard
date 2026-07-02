@@ -8,6 +8,7 @@ namespace JobBoard.Application.Dtos.AuthenticationDtos.User.UserData.Profile
 {
     public class EmployerProfileDto
     {
+        public int Id { get; set; }
         public string userId { get; set; }
         public string CompanyName { get; set; } = default!;
         public string Location { get; set; } = default!;
