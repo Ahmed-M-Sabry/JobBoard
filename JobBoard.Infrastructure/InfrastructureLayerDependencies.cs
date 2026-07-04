@@ -32,6 +32,7 @@ namespace JobBoard.Infrastructure
             service.AddScoped<ISeekerProfileService, SeekerProfileService>();
             service.AddScoped<IEmployerProfileService, EmployerProfileService>();
             service.AddScoped<IJobPostService, JobPostService>();
+            service.AddScoped<IJobApplicationService, JobApplicationService>();
 
             return service;
         }

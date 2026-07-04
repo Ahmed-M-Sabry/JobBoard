@@ -21,7 +21,6 @@ namespace JobBoard.Infrastructure.Implementation
         public async Task<SeekerProfileDto> GetByUserIdAsync(string userId)
         {
             var profile = await _context.SeekerProfiles
-                .AsNoTracking()
                 .FirstOrDefaultAsync(x => x.ApplicationUserId == userId);
 
             if (profile == null)
@@ -29,6 +28,7 @@ namespace JobBoard.Infrastructure.Implementation
 
             return new SeekerProfileDto
             {
+                Id = profile.Id,
                 userId = profile.ApplicationUserId,
                 JobTitle = profile.JobTitle,
                 Location = profile.Location,

@@ -11,7 +11,6 @@ namespace JobBoard.Application.Dtos.JobApplication
     public class CreateJobApplication
     {
         public int JobPostId { get; set; }
-        public ApplicationStatus Status { get; set; } = ApplicationStatus.Pending;
         public string? CVLink { get; set; }
     }
 }
