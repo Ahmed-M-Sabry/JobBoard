@@ -9,6 +9,7 @@ namespace JobBoard.Application.Dtos.JobPost
 {
     public class JobPostDto
     {
+        public int Id { get; set; }
         public string Title { get; set; } = default!;
         public string Description { get; set; } = default!;
         public string CompanyLocation { get; set; } = default!;

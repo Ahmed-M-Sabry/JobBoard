@@ -21,6 +21,7 @@ namespace JobBoard.Infrastructure.Implementation
                 .Where(j => !j.IsDeleted && j.JobPostStatus == JobStatus.Open)
                 .Select(j => new JobPostDto
                 {
+                    Id = j.Id,
                     Title = j.Title,
                     Description = j.Description,
                     CompanyLocation = j.Location,
@@ -43,6 +44,7 @@ namespace JobBoard.Infrastructure.Implementation
 
             var dto = new JobPostDto
             {
+                Id = job.Id,
                 Title = job.Title,
                 Description = job.Description,
                 CompanyLocation = job.Location,
@@ -115,6 +117,7 @@ namespace JobBoard.Infrastructure.Implementation
 
             var dto = new JobPostDto
             {
+                Id = jobPost.Id,
                 Title = jobPost.Title,
                 Description = jobPost.Description,
                 Salary = jobPost.Salary,
@@ -146,6 +149,7 @@ namespace JobBoard.Infrastructure.Implementation
 
             var dto = new JobPostDto
             {
+                Id = jobPost.Id,
                 Title = jobPost.Title,
                 Description = jobPost.Description,
                 Salary = jobPost.Salary,
