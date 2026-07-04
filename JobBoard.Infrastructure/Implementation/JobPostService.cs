@@ -4,6 +4,7 @@ using JobBoard.Application.Interfaces;
 using JobBoard.Domain.Entities;
 using JobBoard.Domain.Enum;
 using JobBoard.Infrastructure.Data;
+using JobBoard.Infrastructure.Implementation.ExtensionMethod;
 using Microsoft.EntityFrameworkCore;
 
 namespace JobBoard.Infrastructure.Implementation
@@ -29,10 +30,37 @@ namespace JobBoard.Infrastructure.Implementation
 
             return Result<List<EmployerJobApplicationCountDto>>.Success(result);
         }
-        public async Task<Result<List<JobPostDto>>> GetAllJobPostsAsync()
+        public async Task<Result<PagedResult<JobPostDto>>> GetAllJobPostsAsync(JobPostQueryParameters query)
         {
-            var jobs = await _context.JobPosts
-                .Where(j => !j.IsDeleted && j.JobPostStatus == JobStatus.Open)
+            var jobsQuery = _context.JobPosts
+                   .AsNoTracking()
+                   .Where(j => !j.IsDeleted);
+
+            if (!string.IsNullOrWhiteSpace(query.Search))
+            {
+                jobsQuery = jobsQuery.Where(j =>
+                    j.Title.Contains(query.Search) ||
+                    j.Description.Contains(query.Search));
+            }
+            if (!string.IsNullOrWhiteSpace(query.Location))
+            {
+                jobsQuery = jobsQuery.Where(j => j.Location == query.Location);
+            }
+            if (query.MinSalary.HasValue)
+            {
+                jobsQuery = jobsQuery.Where(j => j.Salary >= query.MinSalary);
+            }
+
+            if (query.MaxSalary.HasValue)
+            {
+                jobsQuery = jobsQuery.Where(j => j.Salary <= query.MaxSalary);
+            }
+            if (query.Status.HasValue)
+            {
+                jobsQuery = jobsQuery.Where(j => j.JobPostStatus == query.Status);
+            }
+            var projectedQuery = jobsQuery
+                .OrderByDescending(j => j.PostedDate)
                 .Select(j => new JobPostDto
                 {
                     Id = j.Id,
@@ -43,10 +71,12 @@ namespace JobBoard.Infrastructure.Implementation
                     PostedDate = j.PostedDate,
                     EmployeerId = j.EmployerProfileId,
                     JobPostStatus = j.JobPostStatus
-                })
-                .ToListAsync();
+                });
 
-            return Result<List<JobPostDto>>.Success(jobs);
+            var pagedResult = await projectedQuery
+                .ToPagedResultAsync(query.Page, query.PageSize);
+
+            return Result<PagedResult<JobPostDto>>.Success(pagedResult);
         }
         public async Task<Result<JobPostDto>> GetJobPostByIdAsync(int id)
         {
