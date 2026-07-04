@@ -81,50 +81,87 @@ namespace JobBoard.Infrastructure.Implementation
 
             return Result<JobApplicationDto>.Success(dto, "Application updated successfully");
         }
-        
-        public async Task<Result<List<EmployerJobApplicationDto>>> GetJobApplicationsForEmployerAsync(int employerId, int jobPostId)
+
+        public async Task<Result<List<EmployerJobApplicationDto>>> GetJobApplicationsForEmployerAsync(
+            int employerId,
+            int jobPostId)
         {
-            var job = await _context.JobPosts
-                .FirstOrDefaultAsync(j => j.Id == jobPostId && j.EmployerProfileId == employerId);
+            var jobExists = await _context.JobPosts
+                .AnyAsync(j => j.Id == jobPostId && j.EmployerProfileId == employerId);
 
-            if (job == null)
-                return Result<List<EmployerJobApplicationDto>>.Failure("Job post not found or not yours");
+            if (!jobExists)
+                return Result<List<EmployerJobApplicationDto>>
+                    .Failure("Job post not found or not yours");
 
-            //var applications = await _context.JobApplications
-            //    .Where(a => a.JobPostId == jobPostId)
-            //    .ToListAsync();
-
-            var applications = await _context.JobApplications
-                   .Include(a => a.SeekerProfile)
-                   .Include(a => a.JobPost)
-                   .Where(a => a.JobPostId == jobPostId)
-                   .ToListAsync();
-
-            var result = new List<EmployerJobApplicationDto>();
-
-            foreach (var a in applications)
-            {
-                var user = await _identityService.GetUserByIdAsync(a.SeekerProfile.ApplicationUserId);
-
-                result.Add(new EmployerJobApplicationDto
+            var result = await (
+                from application in _context.JobApplications
+                join seeker in _context.SeekerProfiles
+                    on application.SeekerProfileId equals seeker.Id
+                join user in _context.Users
+                    on seeker.ApplicationUserId equals user.Id
+                where application.JobPostId == jobPostId
+                select new EmployerJobApplicationDto
                 {
-                    ApplicationId = a.Id,
-                    SeekerId = a.SeekerProfileId,
+                    ApplicationId = application.Id,
+                    SeekerId = seeker.Id,
 
-                    ApplicantName = user?.FullName ?? "Unknown",
-                    ApplicantEmail = user?.Email ?? "Unknown",
+                    ApplicantName = user.FullName,
+                    ApplicantEmail = user.Email,
 
-                    JobTitle = a.JobPost.Title,
-                    YearsOfExp = a.SeekerProfile.YearsOfExperience,
+                    JobTitle = application.JobPost.Title,
+                    YearsOfExp = seeker.YearsOfExperience,
 
-                    CVLink = a.CVLink ?? "",
-                    Status = a.Status,
-                    AppliedAt = a.CreatedAt,
-                });
-            }
+                    CVLink = application.CVLink ?? "",
+                    Status = application.Status,
+                    AppliedAt = application.CreatedAt
+                })
+                .ToListAsync();
 
             return Result<List<EmployerJobApplicationDto>>.Success(result);
         }
+        //public async Task<Result<List<EmployerJobApplicationDto>>> GetJobApplicationsForEmployerAsync(int employerId, int jobPostId)
+        //{
+        //    var job = await _context.JobPosts
+        //        .FirstOrDefaultAsync(j => j.Id == jobPostId && j.EmployerProfileId == employerId);
+
+        //    if (job == null)
+        //        return Result<List<EmployerJobApplicationDto>>.Failure("Job post not found or not yours");
+
+        //    //var applications = await _context.JobApplications
+        //    //    .Where(a => a.JobPostId == jobPostId)
+        //    //    .ToListAsync();
+
+        //    var applications = await _context.JobApplications
+        //           .Include(a => a.SeekerProfile)
+        //           .Include(a => a.JobPost)
+        //           .Where(a => a.JobPostId == jobPostId)
+        //           .ToListAsync();
+
+        //    var result = new List<EmployerJobApplicationDto>();
+
+        //    foreach (var a in applications)
+        //    {
+        //        var user = await _identityService.GetUserByIdAsync(a.SeekerProfile.ApplicationUserId);
+
+        //        result.Add(new EmployerJobApplicationDto
+        //        {
+        //            ApplicationId = a.Id,
+        //            SeekerId = a.SeekerProfileId,
+
+        //            ApplicantName = user?.FullName ?? "Unknown",
+        //            ApplicantEmail = user?.Email ?? "Unknown",
+
+        //            JobTitle = a.JobPost.Title,
+        //            YearsOfExp = a.SeekerProfile.YearsOfExperience,
+
+        //            CVLink = a.CVLink ?? "",
+        //            Status = a.Status,
+        //            AppliedAt = a.CreatedAt,
+        //        });
+        //    }
+
+        //    return Result<List<EmployerJobApplicationDto>>.Success(result);
+        //}
         public async Task<Result<EmployerJobApplicationDto>> GetByIdForEmployerAsync(int employerId, int applicationId)
         {
             var application = await _context.JobApplications
@@ -240,5 +277,6 @@ namespace JobBoard.Infrastructure.Implementation
 
             return Result<EmployerJobApplicationDto>.Success(dto, "Status updated successfully");
         }
+
     }
 }

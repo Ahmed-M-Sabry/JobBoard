@@ -15,6 +15,20 @@ namespace JobBoard.Infrastructure.Implementation
         {
             _context = context;
         }
+        public async Task<Result<List<EmployerJobApplicationCountDto>>> GetJobsAndApplicationsCountForEmployerAsync(int employerId)
+        {
+            var result = await _context.JobPosts
+                .Where(j => j.EmployerProfileId == employerId)
+                .Select(j => new EmployerJobApplicationCountDto
+                {
+                    Id = j.Id,
+                    JobPostName = j.Title,
+                    ApplicationsCount = j.JobApplications.Count()
+                })
+                .ToListAsync();
+
+            return Result<List<EmployerJobApplicationCountDto>>.Success(result);
+        }
         public async Task<Result<List<JobPostDto>>> GetAllJobPostsAsync()
         {
             var jobs = await _context.JobPosts
