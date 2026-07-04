@@ -19,6 +19,8 @@ namespace JobBoard.Domain.Entities
         public JobStatus JobPostStatus { get; set; } = JobStatus.Open;
         public DateTime ClosedAt { get; set; }
 
+        public ICollection<JobApplication> JobApplications { get; set; } = new List<JobApplication>();
+
         // Navigation properties
         public EmployerProfile EmployerProfile { get; set; }
         public int EmployerProfileId { get; set; }

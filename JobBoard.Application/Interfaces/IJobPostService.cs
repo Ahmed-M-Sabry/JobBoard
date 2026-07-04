@@ -13,6 +13,7 @@ namespace JobBoard.Application.Interfaces
         Task<Result<JobPostDto>> CreateJobPostAsync(CreateJobPost request, int employerId);
         Task<Result<JobPostDto>> UpdateJobPostAsync(int employeer , int jobPostId, EditJobPost request);
 
+        Task<Result<List<EmployerJobApplicationCountDto>>> GetJobsAndApplicationsCountForEmployerAsync(int employerId);
         Task<Result<List<JobPostDto>>> GetAllJobPostsAsync();
         Task<Result<JobPostDto>> GetJobPostByIdAsync(int id);
 

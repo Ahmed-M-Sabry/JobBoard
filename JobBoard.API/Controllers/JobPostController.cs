@@ -1,6 +1,7 @@
 ﻿using JobBoard.Application.Dtos.JobPost;
 using JobBoard.Application.Interfaces;
 using JobBoard.Domain.Common;
+using JobBoard.Infrastructure.Implementation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,28 @@ namespace JobBoard.API.Controllers
     {
         private readonly IJobPostService _jobPostService;
         private readonly IEmployerProfileService _employerProfileService;
+       
         public JobPostController(IJobPostService jobPostService, IEmployerProfileService employerProfileService)
         {
             _jobPostService = jobPostService;
             _employerProfileService = employerProfileService;
+        }
+        [HttpGet("job/applications")]
+        [Authorize(Roles = AppRoles.Employer)]
+        public async Task<IActionResult> GetJobsAndApplicationsCount()
+        {
+            var employerId = await GetEmployerProfileId();
+
+            if (employerId == null)
+                return Unauthorized("Employer not found");
+
+            var result = await _jobPostService
+                .GetJobsAndApplicationsCountForEmployerAsync(employerId.Value);
+
+            if (!result.IsSuccess)
+                return BadRequest(result.Message);
+
+            return Ok(result.Data);
         }
         [HttpGet]
         public async Task<IActionResult> GetAll()
