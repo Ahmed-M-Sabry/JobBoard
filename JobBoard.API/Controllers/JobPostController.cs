@@ -1,4 +1,5 @@
-﻿using JobBoard.Application.Dtos.JobPost;
+﻿using JobBoard.Application.Dtos.JobApplication;
+using JobBoard.Application.Dtos.JobPost;
 using JobBoard.Application.Interfaces;
 using JobBoard.Domain.Common;
 using JobBoard.Infrastructure.Implementation;
@@ -39,9 +40,9 @@ namespace JobBoard.API.Controllers
             return Ok(result.Data);
         }
         [HttpGet]
-        public async Task<IActionResult> GetAll()
+        public async Task<IActionResult> GetAll([FromBody] JobPostQueryParameters query)
         {
-            var result = await _jobPostService.GetAllJobPostsAsync();
+            var result = await _jobPostService.GetAllJobPostsAsync(query);
             return Ok(result);
         }
         [HttpGet("{id}")]

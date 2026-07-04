@@ -14,7 +14,7 @@ namespace JobBoard.Application.Interfaces
         Task<Result<JobPostDto>> UpdateJobPostAsync(int employeer , int jobPostId, EditJobPost request);
 
         Task<Result<List<EmployerJobApplicationCountDto>>> GetJobsAndApplicationsCountForEmployerAsync(int employerId);
-        Task<Result<List<JobPostDto>>> GetAllJobPostsAsync();
+        Task<Result<PagedResult<JobPostDto>>> GetAllJobPostsAsync(JobPostQueryParameters query);
         Task<Result<JobPostDto>> GetJobPostByIdAsync(int id);
 
         Task<Result<string>> SoftDeleteJobPostAsync(int employeerId, int jobPostId);
