@@ -32,6 +32,7 @@ namespace JobBoard.Infrastructure.Implementation
         }
         public async Task<Result<PagedResult<JobPostDto>>> GetAllJobPostsAsync(JobPostQueryParameters query)
         {
+
             var jobsQuery = _context.JobPosts
                    .AsNoTracking()
                    .Where(j => !j.IsDeleted);
@@ -41,6 +42,9 @@ namespace JobBoard.Infrastructure.Implementation
                 jobsQuery = jobsQuery.Where(j =>
                     j.Title.Contains(query.Search) ||
                     j.Description.Contains(query.Search));
+                //jobsQuery = jobsQuery.Where(m =>
+                //    EF.Functions.Like(m.Title, $"%{query.Search}%") ||
+                //    EF.Functions.Like(m.Description, $"%{query.Search}%"));
             }
             if (!string.IsNullOrWhiteSpace(query.Location))
             {
