@@ -13,10 +13,12 @@ namespace JobBoard.Infrastructure.Implementation
     {
         private readonly ApplicationDbContext _context;
         private readonly IIdentityService _identityService;
-        public JobApplicationService(ApplicationDbContext context,IIdentityService identityService)
+        private readonly ICacheService _cache;
+        public JobApplicationService(ApplicationDbContext context,IIdentityService identityService, ICacheService cache)
         {
             _context = context;
             _identityService = identityService;
+            _cache = cache;
         }
         public async Task<Result<JobApplicationDto>> ApplyAsync(int seekerId, CreateJobApplication request)
         {
@@ -201,6 +203,10 @@ namespace JobBoard.Infrastructure.Implementation
                    .Where(a => a.SeekerProfileId == seekerId)
                    .ToListAsync();
 
+            var cachedData = _cache.GetData<List<JobApplicationDto>>("application");
+            if(cachedData != null)
+                return Result<List<JobApplicationDto>>.Success(cachedData);
+
             var result = applications.Select(a => new JobApplicationDto
             {
                 Id = a.Id,
@@ -209,6 +215,8 @@ namespace JobBoard.Infrastructure.Implementation
                 CVLink = a.CVLink ?? "",
                 Status = a.Status
             }).ToList();
+
+            _cache.SetData<List<JobApplicationDto>>("application",result, TimeSpan.FromMinutes(10));
 
             return Result<List<JobApplicationDto>>.Success(result);
         }

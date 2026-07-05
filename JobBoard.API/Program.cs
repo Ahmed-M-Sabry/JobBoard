@@ -4,6 +4,7 @@ using JobBoard.Infrastructure;
 using JobBoard.Infrastructure.Data;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +15,13 @@ builder.Services.AddSwaggerGen();
 builder.Services
     .InfrastructureLayerServices()
     .ApplicationLayerServices();
+
+// Redis Configuration
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+{
+    var config = builder.Configuration["Redis:ConnectionString"];
+    return ConnectionMultiplexer.Connect(config);
+});
 
 builder.Services.Configure<JwtSetting>(builder.Configuration.GetSection(nameof(JwtSetting)));
 

@@ -5,19 +5,28 @@ using JobBoard.Domain.Entities;
 using JobBoard.Domain.Enum;
 using JobBoard.Infrastructure.Data;
 using JobBoard.Infrastructure.Implementation.ExtensionMethod;
+using JobBoard.Infrastructure.Implementation.RedisImplementation;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Distributed;
 
 namespace JobBoard.Infrastructure.Implementation
 {
     public class JobPostService : IJobPostService
     {
         private readonly ApplicationDbContext _context;
-        public JobPostService(ApplicationDbContext context)
+        private readonly ICacheService _cacheService;
+
+        public JobPostService(ApplicationDbContext context, ICacheService cacheService)
         {
             _context = context;
+            _cacheService = cacheService;
         }
         public async Task<Result<List<EmployerJobApplicationCountDto>>> GetJobsAndApplicationsCountForEmployerAsync(int employerId)
         {
+            var CachedData = _cacheService.GetData<List<EmployerJobApplicationCountDto>>("JobApplicationCount");
+            if(CachedData != null) 
+                return Result<List<EmployerJobApplicationCountDto>>.Success(CachedData);
+
             var result = await _context.JobPosts
                 .Where(j => j.EmployerProfileId == employerId)
                 .Select(j => new EmployerJobApplicationCountDto
@@ -28,10 +37,20 @@ namespace JobBoard.Infrastructure.Implementation
                 })
                 .ToListAsync();
 
+            _cacheService.SetData<List<EmployerJobApplicationCountDto>>("JobApplicationCount", result, TimeSpan.FromMinutes(10));
+
             return Result<List<EmployerJobApplicationCountDto>>.Success(result);
         }
         public async Task<Result<PagedResult<JobPostDto>>> GetAllJobPostsAsync(JobPostQueryParameters query)
         {
+            // Generate a unique cache key based on the query parameters
+            var cacheKey = $"jobposts:{query.Search}:{query.Location}:{query.MinSalary}:{query.MaxSalary}:{query.Status}:{query.Page}:{query.PageSize}";
+            // Try to get the cached data
+            var cachedData = _cacheService.GetData<PagedResult<JobPostDto>>(cacheKey);
+
+            if (cachedData != null)
+                return Result<PagedResult<JobPostDto>>.Success(cachedData);
+            
 
             var jobsQuery = _context.JobPosts
                    .AsNoTracking()
@@ -79,6 +98,9 @@ namespace JobBoard.Infrastructure.Implementation
 
             var pagedResult = await projectedQuery
                 .ToPagedResultAsync(query.Page, query.PageSize);
+
+            // Cache the result for 10 minutes
+            _cacheService.SetData(cacheKey, pagedResult, TimeSpan.FromMinutes(10));
 
             return Result<PagedResult<JobPostDto>>.Success(pagedResult);
         }
