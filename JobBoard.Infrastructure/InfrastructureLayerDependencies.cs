@@ -2,9 +2,11 @@
 using JobBoard.Infrastructure.Authentication;
 using JobBoard.Infrastructure.Data;
 using JobBoard.Infrastructure.Implementation;
+using JobBoard.Infrastructure.Implementation.RedisImplementation;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+
 
 namespace JobBoard.Infrastructure
 {
@@ -34,6 +36,11 @@ namespace JobBoard.Infrastructure
             service.AddScoped<IJobPostService, JobPostService>();
             service.AddScoped<IJobApplicationService, JobApplicationService>();
 
+
+
+
+            service.AddScoped<ICacheService, CacheService>();
+            
             return service;
         }
     }
