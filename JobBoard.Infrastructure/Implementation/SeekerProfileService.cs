@@ -90,7 +90,7 @@ namespace JobBoard.Infrastructure.Implementation
                     PortfolioUrl = seekerProfile.PortfolioUrl,
                     AccessToken = _tokenService.GenerateAccessToken(user , UserRoles),
                     RefreshToken = await _tokenService.GenerateRefreshToken(user),
-                    ExpiresAt = DateTime.UtcNow.AddMinutes(15)
+                    ExpiresAt = _tokenService.GetTokenExpiration()
                 };
             }
             catch (Exception ex)

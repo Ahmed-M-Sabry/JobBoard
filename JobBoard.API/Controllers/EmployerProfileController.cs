@@ -49,12 +49,9 @@ namespace JobBoard.API.Controllers
                 if (userId == null)
                     return Unauthorized();
 
-                await _employerProfileService.CreateAsync(userId, dto);
+                var result = await _employerProfileService.CreateAsync(userId, dto);
 
-                return Ok(new
-                {
-                    message = "Employer profile created successfully."
-                });
+                return Ok(result);
             }
             catch (Exception ex)
             {

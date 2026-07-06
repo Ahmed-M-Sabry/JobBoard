@@ -1,5 +1,6 @@
 ﻿using JobBoard.Application.Dtos.AuthenticationDtos.User.UserData.Profile;
 using JobBoard.Application.Dtos.AuthenticationDtos.UserData;
+using JobBoard.Domain.Entities.Users;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace JobBoard.Application.Interfaces
 {
     public interface IEmployerProfileService
     {
-        Task CreateAsync(string userId, CreateEmployeerProfileDto dto);
+        Task<BecomeEmployeerDto> CreateAsync(string userId, CreateEmployeerProfileDto dto);
         Task<EmployerProfileDto> GetByUserIdAsync(string userId);
 
         //Task UpdateAsync(string userId, UpdateEmployerProfileDto dto);

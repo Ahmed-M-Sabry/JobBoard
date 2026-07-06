@@ -12,13 +12,16 @@ namespace JobBoard.Infrastructure.Implementation
     {
         private readonly ApplicationDbContext _context;
         private readonly IIdentityService _identityService;
+        private readonly ITokenService _tokenService;
 
         public EmployerProfileService(
-            ApplicationDbContext context,
-            IIdentityService identityService)
+            ApplicationDbContext context
+            , IIdentityService identityService
+            , ITokenService tokenService)
         {
             _context = context;
             _identityService = identityService;
+            _tokenService = tokenService;
         }
         public async Task<EmployerProfileDto> GetByUserIdAsync(string userId)
         {
@@ -38,7 +41,7 @@ namespace JobBoard.Infrastructure.Implementation
                 Description = profile.Description
             };
         }
-        public async Task CreateAsync(string userId, CreateEmployeerProfileDto dto)
+        public async Task<BecomeEmployeerDto> CreateAsync(string userId, CreateEmployeerProfileDto dto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
 
@@ -69,10 +72,24 @@ namespace JobBoard.Infrastructure.Implementation
                 _context.EmployerProfiles.Add(employerProfile);
 
                 await _context.SaveChangesAsync();
-
                 await _identityService.AddToRoleAsync(userId, AppRoles.Employer);
 
                 await transaction.CommitAsync();
+
+                var UserRoles = await _identityService.GetRolesAsync(userId);
+                var token = _tokenService.GenerateAccessToken(user , UserRoles);
+                var refreshToken = await _tokenService.GenerateRefreshToken(user);
+
+                return new BecomeEmployeerDto
+                {
+                    ApplicationUserId = userId,
+                    CompanyName = dto.CompanyName,
+                    Location = dto.Location,
+                    Description = dto.Description,
+                    AccessToken = token,
+                    RefreshToken = refreshToken,
+                    ExpiresAt = _tokenService.GetTokenExpiration()
+                };
             }
             catch (Exception ex)
             {
