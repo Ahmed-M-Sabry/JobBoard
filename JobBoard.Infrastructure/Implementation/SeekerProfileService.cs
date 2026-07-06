@@ -13,10 +13,14 @@ namespace JobBoard.Infrastructure.Implementation
     {
         private readonly ApplicationDbContext _context;
         private readonly IIdentityService _identityService;
-        public SeekerProfileService(ApplicationDbContext context, IIdentityService identityService)
+        private readonly ITokenService _tokenService;
+        public SeekerProfileService(ApplicationDbContext context
+            , IIdentityService identityService
+            , ITokenService tokenService)
         {
             _context = context;
             _identityService = identityService;
+            _tokenService = tokenService;
         }
         public async Task<SeekerProfileDto> GetByUserIdAsync(string userId)
         {
@@ -40,7 +44,7 @@ namespace JobBoard.Infrastructure.Implementation
             };
         }
 
-        public async Task CreateAsync(string userId, CreateSeekerProfileDto dto)
+        public async Task<BecomeSeekerDto> CreateAsync(string userId, CreateSeekerProfileDto dto)
         {
             using var transaction = await _context.Database.BeginTransactionAsync();
             try
@@ -67,11 +71,27 @@ namespace JobBoard.Infrastructure.Implementation
                     PortfolioUrl = dto.PortfolioUrl
                 };
                 _context.Add(seekerProfile);
+
                 await _context.SaveChangesAsync();
-
                 await _identityService.AddToRoleAsync(userId, AppRoles.Seeker);
-
                 await transaction.CommitAsync();
+
+                var UserRoles = await _identityService.GetRolesAsync(userId);
+
+                return new BecomeSeekerDto
+                {
+                    ApplicationUserId = userId,
+                    JobTitle = seekerProfile.JobTitle,
+                    Location = seekerProfile.Location,
+                    Bio = seekerProfile.Bio,
+                    YearsOfExperience = seekerProfile.YearsOfExperience,
+                    LinkedInUrl = seekerProfile.LinkedInUrl,
+                    GitHubUrl = seekerProfile.GitHubUrl,
+                    PortfolioUrl = seekerProfile.PortfolioUrl,
+                    AccessToken = _tokenService.GenerateAccessToken(user , UserRoles),
+                    RefreshToken = await _tokenService.GenerateRefreshToken(user),
+                    ExpiresAt = DateTime.UtcNow.AddMinutes(15)
+                };
             }
             catch (Exception ex)
             {

@@ -15,9 +15,11 @@ namespace JobBoard.API.Controllers
     public class SeekerProfileController : ControllerBase
     {
         private readonly ISeekerProfileService _seekerProfileService;
+
         public SeekerProfileController(ISeekerProfileService seekerProfileService)
         {
             _seekerProfileService = seekerProfileService;
+
         }
 
         [HttpGet("Profile")]
@@ -47,14 +49,14 @@ namespace JobBoard.API.Controllers
             try
             {
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+
                 if (userId == null)
                 {
                     return Unauthorized();
                 }
+                var result = await _seekerProfileService.CreateAsync(userId, dto);
 
-                await _seekerProfileService.CreateAsync(userId, dto);
-
-                return Ok(new { message = "Seeker profile created successfully." });
+                return Ok(result);
             }
             catch (Exception ex)
             {
