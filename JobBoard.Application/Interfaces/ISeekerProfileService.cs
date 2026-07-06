@@ -10,7 +10,7 @@ namespace JobBoard.Application.Interfaces
 {
     public interface ISeekerProfileService
     {
-        Task CreateAsync(string userId, CreateSeekerProfileDto dto);
+        Task<BecomeSeekerDto> CreateAsync(string userId, CreateSeekerProfileDto dto);
 
         Task<SeekerProfileDto> GetByUserIdAsync(string userId);
 
