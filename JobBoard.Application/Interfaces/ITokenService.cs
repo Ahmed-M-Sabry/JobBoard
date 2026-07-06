@@ -19,7 +19,7 @@ namespace JobBoard.Application.Interfaces
         Task<AuthenticatedUserDto> ValidateRefreshTokenAsync(string refreshToken);
 
         Task LogoutAsync(string refreshTokenfromCookie);
-
+        DateTime GetTokenExpiration();
 
     }
 }

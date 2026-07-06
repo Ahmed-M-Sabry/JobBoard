@@ -108,6 +108,10 @@ namespace JobBoard.Infrastructure.Implementation
             }
         }
 
+        public DateTime GetTokenExpiration()
+        {
+            return DateTime.UtcNow.AddMinutes(_jwtSettings.ExpiryMinutes);
+        }
         //public async Task<string> ValidateRefreshTokenAsync(string RefreshToken)
         //{
         //    var refreshToken = await _context.RefreshTokens
